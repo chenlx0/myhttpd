@@ -61,7 +61,7 @@ size_t get_mime_type(char *suffix, char *dst, size_t len) {
         if (len == mime_types[i].len) {
             if (strncmp(suffix, mime_types[i].m_suffix, len) == 0) {
                 size_t mime_name_len = strlen(mime_types[i].m_type_name);
-                memcpy(dst, mime_types[i].m_type_name, mime_name_len);
+                memcpy(dst, mime_types[i].m_type_name, mime_name_len+1);
                 return mime_name_len;
             }
         }   
@@ -140,7 +140,7 @@ void resp_not_implemented(int conn_fd) {
     const char *not_implement = "HTTP/1.0 501 Not Implemented\r\n";
     const char *msg = "501 Method Not Implemented.\r\n";
     send(conn_fd, not_implement, strlen(not_implement), MSG_NOSIGNAL);
-    resp_headers(conn_fd, "html/text", strlen(msg));
+    resp_headers(conn_fd, "text/html", strlen(msg));
     send(conn_fd, msg, strlen(msg), MSG_NOSIGNAL);
 }
 
@@ -148,15 +148,15 @@ void resp_not_found(int conn_fd) {
     const char *not_found = "HTTP/1.0 404 Not Found\r\n";
     const char *msg = "404 File not found.\r\n";
     send(conn_fd, not_found, strlen(not_found), MSG_NOSIGNAL);
-    resp_headers(conn_fd, "html/text", strlen(msg));
+    resp_headers(conn_fd, "text/html", strlen(msg));
     send(conn_fd, msg, strlen(msg), MSG_NOSIGNAL);
 }
 
 void resp_bad_request(int conn_fd) {
     const char *bad_request = "HTTP/1.0 400 Bad Request\r\n";
-    const char *msg = "<html><p>400 Bad Request.</p></html>\r\n";
+    const char *msg = "400 Bad Request.\r\n";
     send(conn_fd, bad_request, strlen(bad_request), MSG_NOSIGNAL);
-    resp_headers(conn_fd, "html/text", strlen(msg));
+    resp_headers(conn_fd, "text/html", strlen(msg));
     send(conn_fd, msg, strlen(msg), MSG_NOSIGNAL);
 }
 
@@ -174,7 +174,6 @@ void serve_file(int conn_fd, char *path) {
             break;
         }
     }
-
 
     const char *ok = "HTTP/1.0 200 OK\r\n";
     ssize_t len;
